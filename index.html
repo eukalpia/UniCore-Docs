@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniCore Documentation</title>
-    <meta name="author" content="Умаралиев Равшан Рустамжон угли (eukalpia)">
-    <meta name="description" content="Полная документация UniCore API Gateway на Rust: YAML-конфиг, pipeline, примеры, запуск, FAQ, автор eukalpia.">
-    <link rel="stylesheet" href="style.css">
-    <script>
-      function toggleCode(id) {
-        var el = document.getElementById(id);
-        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-      }
-    </script>
-</head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UniCore Documentation</title>
+        <meta name="author" content="Умаралиев Равшан Рустамжон угли (eukalpia)">
+        <meta name="description" content="Полная документация UniCore API Gateway на Rust: YAML-конфиг, pipeline, примеры, запуск, FAQ, автор eukalpia.">
+        <link rel="stylesheet" href="style.css">
+        <!-- highlight.js premium theme -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script>
+          function toggleCode(id) {
+            var el = document.getElementById(id);
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+          }
+        </script>
+    </head>
 <body>
     <header>
         <h1>UniCore — Unified Concurrency Reactor</h1>
@@ -221,6 +225,92 @@ routes:
                 <li>Запустите: <code>cargo run --release</code></li>
                 <li>Изменения в <b>unicore.yaml</b> применяются на лету (hot reload).</li>
             </ol>
+        </section>
+        <section id="interaction">
+            <h2>Взаимодействие с UniCore API Gateway</h2>
+            <p>Ниже приведены основные сценарии и примеры кода для работы с UniCore как с API Gateway:</p>
+            <ul>
+                <li><b>Проксирование REST-запросов:</b> UniCore принимает HTTP(S) запросы и перенаправляет их на backend-сервисы. <br>
+                    <b>Пример запроса:</b>
+                    <pre><code class="bash">curl -X GET http://localhost:3000/api/resource</code></pre>
+                </li>
+                <li><b>Балансировка нагрузки:</b> Запросы к одному маршруту равномерно распределяются между backend-ами. <br>
+                    <b>Пример pipeline в YAML:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: proxy_pass
+    targets:
+      - "http://localhost:8080"
+      - "http://localhost:8081"
+    strategy: round_robin</code></pre>
+                </li>
+                <li><b>Кэширование:</b> UniCore кэширует ответы backend-ов для ускорения повторных запросов. <br>
+                    <b>Пример pipeline:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: response_cache
+    ttl: "30s"
+  - type: proxy_pass
+    targets:
+      - "http://localhost:8080"</code></pre>
+                </li>
+                <li><b>Rate limiting:</b> Ограничение количества запросов по IP, токену или заголовку. <br>
+                    <b>Пример pipeline:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: rate_limit
+    by: ip
+    limit: 10
+    window: "1m"
+  - type: return_response
+    status: 200
+    body: "OK"</code></pre>
+                </li>
+                <li><b>JWT-аутентификация:</b> Проверка JWT-токена пользователя. <br>
+                    <b>Пример pipeline:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: jwt_auth
+    jwks_file: "./jwks.json"
+    issuer: "my-local-issuer"
+    audience: "unicore-local-api"
+  - type: return_response
+    status: 200
+    body: "Добро пожаловать, ${auth.claims.sub}!"</code></pre>
+                </li>
+                <li><b>Health-check:</b> Автоматическая проверка доступности backend-ов. <br>
+                    <b>Пример настройки:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: proxy_pass
+    targets:
+      - "http://localhost:8080"
+    health_check:
+      path: "/"
+      interval: "5s"
+      timeout: "2s"</code></pre>
+                </li>
+                <li><b>Работа с переменными:</b> Используйте переменные в body и headers для динамических ответов. <br>
+                    <b>Пример:</b>
+                    <pre><code class="yaml">body: '{"user": "${auth.claims.sub}", "count": "${counter.visits.new_value}"}'</code></pre>
+                </li>
+                <li><b>Ответы без backend:</b> Возврат статических ответов без обращения к backend-у. <br>
+                    <b>Пример:</b>
+                    <pre><code class="yaml">pipeline:
+  - type: return_response
+    status: 200
+    body: "Service is up!"</code></pre>
+                </li>
+            </ul>
+            <h3>Пример ответа с кэшем</h3>
+            <pre><code class="json">{
+  "result": "ok",
+  "cached": true
+}</code></pre>
+            <h3>Пример ответа при превышении лимита</h3>
+            <pre><code class="json">{
+  "error": "Rate limit exceeded"
+}</code></pre>
+            <h3>Пример ответа при успешной JWT-аутентификации</h3>
+            <pre><code class="json">{
+  "message": "Welcome, authenticated user!",
+  "subject": "user_id_123"
+}</code></pre>
         </section>
     </main>
     <footer>
