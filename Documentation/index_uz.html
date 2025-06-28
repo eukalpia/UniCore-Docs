@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCore Hujjatlari</title>
+    <meta name="author" content="Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)">
+    <meta name="description" content="To‘liq UniCore API Gateway hujjatlari: YAML konfiguratsiya, pipeline, misollar, ishga tushirish, FAQ, muallif eukalpia.">
+    <link rel="stylesheet" href="style.css">
+    <script>
+      function toggleCode(id) {
+        var el = document.getElementById(id);
+        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+      }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>UniCore — Hujjatlar</h1>
+        <nav>
+            <a href="#about">Loyiha haqida</a>
+            <a href="#features">Imkoniyatlar</a>
+            <a href="#yaml">YAML konfiguratsiya</a>
+            <a href="#pipeline">Pipeline</a>
+            <a href="#actions">Amallar</a>
+            <a href="#examples">Misollar</a>
+            <a href="#faq">FAQ</a>
+            <a href="#run">Ishga tushirish</a>
+            <a href="index.html">RU</a> | <a href="index_en.html">EN</a>
+        </nav>
+    </header>
+    <main>
+        <section id="about">
+            <h2>Loyiha haqida</h2>
+            <p><b>UniCore</b> — Rust tilida yozilgan professional asinxron API Gateway. Proxy, balanslash, kesh, JWT, rate limiting, health-check, hot reload va strukturalangan loglarni qo‘llab-quvvatlaydi.<br><br><b>Muallif:</b> <a href="https://github.com/eukalpia" target="_blank">Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a></p>
+        </section>
+        <section id="features">
+            <h2>Imkoniyatlar</h2>
+            <ul class="features">
+                <li>HTTP(S) proksi</li>
+                <li>Yuklamani balanslash (round robin, random, ip_hash)</li>
+                <li>Javoblarni kesh qilish</li>
+                <li>Rate limiting (IP/token/header bo‘yicha)</li>
+                <li>JWT autentifikatsiya (JWKS, fayl)</li>
+                <li>Backend health-check</li>
+                <li>Hot reload konfiguratsiya</li>
+                <li>Strukturalangan loglar</li>
+                <li>Flexible pipeline</li>
+                <li>Minimal bog‘liqliklar</li>
+                <li>Production-ready arxitektura</li>
+            </ul>
+        </section>
+        <section id="yaml">
+            <h2>YAML konfiguratsiya: Tuzilishi</h2>
+            <pre><code>network:
+  listen_address: "127.0.0.1:3000"
+  tls:
+    cert_path: "cert.pem"
+    key_path: "key.pem"
+
+routes:
+  - path: "/api"
+    match_prefix: true
+    methods: [GET, POST, PUT, DELETE]
+    pipeline:
+      - type: response_cache
+        ttl: "30s"
+      - type: proxy_pass
+        targets:
+          - "http://localhost:8080"
+          - "http://localhost:8081"
+        strategy: round_robin
+        health_check:
+          path: "/"
+          interval: "5s"
+          timeout: "2s"
+  # ... boshqa marshrutlar ...
+</code></pre>
+            <button onclick="toggleCode('full-yaml')">To‘liq misolni ko‘rsatish/yashirish</button>
+            <pre id="full-yaml" style="display:none;"><code>network:
+  listen_address: "127.0.0.1:3000"
+  tls:
+    cert_path: "cert.pem"
+    key_path: "key.pem"
+
+routes:
+  - path: "/api"
+    match_prefix: true
+    methods: [GET, POST, PUT, DELETE]
+    pipeline:
+      - type: response_cache
+        ttl: "30s"
+      - type: proxy_pass
+        targets:
+          - "http://localhost:8080"
+          - "http://localhost:8081"
+        strategy: round_robin
+        health_check:
+          path: "/"
+          interval: "5s"
+          timeout: "2s"
+  - path: "/limited"
+    methods: [GET]
+    pipeline:
+      - type: rate_limit
+        by: ip
+        limit: 10
+        window: "1m"
+      - type: return_response
+        status: 200
+        body: "Siz limit ichidasiz!"
+  - path: "/benchmark"
+    methods: [GET]
+    pipeline:
+      - type: return_response
+        status: 200
+        body: "OK"
+  - path: "/protected"
+    methods: [GET]
+    pipeline:
+      - type: jwt_auth
+        jwks_file: "./jwks.json"
+        issuer: "my-local-issuer"
+        audience: "unicore-local-api"
+      - type: return_response
+        status: 200
+        headers:
+          Content-Type: "application/json; charset=utf-8"
+        body: '{"message": "Xush kelibsiz, autentifikatsiyadan o‘tgan foydalanuvchi!", "subject": "${auth.claims.sub}"}'
+</code></pre>
+        </section>
+        <section id="pipeline">
+            <h2>Pipeline: Umumiy sxema</h2>
+            <p>Pipeline — bu har bir so‘rov uchun bajariladigan amallar ketma-ketligi. Amallar yuqoridan pastga bajariladi.<br> <b>Pipeline quyidagilarni qo‘llab-quvvatlaydi:</b> proksi, kesh, limitlar, autentifikatsiya, javob logikasi, headerlar bilan ishlash, statik fayllar, hisoblagichlar.</p>
+            <img src="https://raw.githubusercontent.com/egorovdmitry/UniCore/main/docs/pipeline_scheme.svg" alt="Pipeline sxemasi" style="max-width:100%;margin:16px 0;">
+        </section>
+        <section id="actions">
+            <h2>Pipeline amallari</h2>
+            <table class="actions">
+                <tr><th>type</th><th>Tavsif</th><th>Parametrlar</th></tr>
+                <tr><td>proxy_pass</td><td>Backendlarga proksi</td><td>targets, strategy, health_check</td></tr>
+                <tr><td>response_cache</td><td>Javoblarni kesh qilish</td><td>ttl</td></tr>
+                <tr><td>rate_limit</td><td>So‘rovlarni cheklash</td><td>by, limit, window</td></tr>
+                <tr><td>jwt_auth</td><td>JWT autentifikatsiya</td><td>jwks_file/jwks_url, issuer, audience</td></tr>
+                <tr><td>return_response</td><td>Statik javob</td><td>status, headers, body</td></tr>
+                <tr><td>increment_counter</td><td>Hisoblagich</td><td>key</td></tr>
+                <tr><td>rewrite_headers</td><td>Headerlarni o‘zgartirish</td><td>set, remove</td></tr>
+                <tr><td>serve_static</td><td>Statik fayllarni berish</td><td>root, strip_prefix</td></tr>
+            </table>
+            <p>Har bir amal boshqalar bilan birga ishlatilishi mumkin — murakkab so‘rovlarni qayta ishlash uchun.</p>
+        </section>
+        <section id="examples">
+            <h2>Konfiguratsiya misollari</h2>
+            <h3>Minimal konfiguratsiya</h3>
+            <pre><code>network:
+  listen_address: "127.0.0.1:3000"
+routes:
+  - path: "/"
+    methods: [GET]
+    pipeline:
+      - type: return_response
+        status: 200
+        body: "Salom, dunyo!"
+</code></pre>
+            <h3>JWT bilan himoyalangan marshrut</h3>
+            <pre><code>- path: "/protected"
+  methods: [GET]
+  pipeline:
+    - type: jwt_auth
+      jwks_file: "./jwks.json"
+      issuer: "my-local-issuer"
+      audience: "unicore-local-api"
+    - type: return_response
+      status: 200
+      headers:
+        Content-Type: "application/json; charset=utf-8"
+      body: '{"message": "Xush kelibsiz, autentifikatsiyadan o‘tgan foydalanuvchi!", "subject": "${auth.claims.sub}"}'
+</code></pre>
+            <h3>Kesh va balanslash</h3>
+            <pre><code>- path: "/api"
+  match_prefix: true
+  methods: [GET, POST]
+  pipeline:
+    - type: response_cache
+      ttl: "10s"
+    - type: proxy_pass
+      targets:
+        - "http://localhost:8080"
+        - "http://localhost:8081"
+      strategy: random
+</code></pre>
+        </section>
+        <section id="faq">
+            <h2>FAQ</h2>
+            <details><summary>Hot reload qanday ishlaydi?</summary>
+                <div><b>unicore.yaml</b> dagi har qanday o‘zgarish serverni qayta ishga tushirmasdan avtomatik qo‘llaniladi.</div>
+            </details>
+            <details><summary>Qanday qilib o‘z action qo‘shsam bo‘ladi?</summary>
+                <div>Rust kodida Action enumiga yangi tur qo‘shing va pipeline_processor.rs da uni amalga oshiring.</div>
+            </details>
+            <details><summary>Maksimal RPS qancha?</summary>
+                <div>Temir va OS ga bog‘liq. Linuxda UniCore oddiy marshrutlarda o‘n minglab RPS bera oladi.</div>
+            </details>
+            <details><summary>Production uchun misollar qayerda?</summary>
+                <div><a href="#examples">Misollar bo‘limi</a> va repozitoriyadagi <b>README.md</b> ga qarang.</div>
+            </details>
+            <details><summary>Body/headersda o‘zgaruvchilar qanday ishlaydi?</summary>
+                <div><code>${counter.key.new_value}</code>, <code>${auth.claims.sub}</code>, <code>${header.X-My-Header}</code> kabi dinamik qiymatlar ishlatiladi.</div>
+            </details>
+            <details><summary>TLS ni qanday yoqaman?</summary>
+                <div><b>network</b> bo‘limida <b>tls</b> ni sertifikat va kalit yo‘llari bilan ko‘rsating.</div>
+            </details>
+            <details><summary>So‘rovlarni qanday log qilaman?</summary>
+                <div>Standart tracing orqali. Faylga chiqarishni main.rs da sozlash mumkin.</div>
+            </details>
+        </section>
+        <section id="run">
+            <h2>UniCore ni ishga tushirish</h2>
+            <ol>
+                <li>Rust ni o‘rnating: <a href="https://rustup.rs/">https://rustup.rs/</a></li>
+                <li>Loyihani build qiling: <code>cargo build --release</code></li>
+                <li>Ishga tushiring: <code>cargo run --release</code></li>
+                <li><b>unicore.yaml</b> dagi o‘zgarishlar hot reload orqali darhol qo‘llaniladi.</li>
+            </ol>
+        </section>
+    </main>
+    <footer>
+        <p>UniCore &copy; 2025. Muallif: <a href="https://github.com/eukalpia" target="_blank">Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a>. GitHub Pages uchun hujjatlar.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,125 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f8f9fa;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #2d3e50;
+    color: #fff;
+    padding: 24px 0 12px 0;
+    text-align: center;
+    box-shadow: 0 2px 8px #0001;
+}
+header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.2em;
+    letter-spacing: 1px;
+}
+nav {
+    margin-bottom: 10px;
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 18px;
+    font-weight: 500;
+    font-size: 1.1em;
+    transition: color 0.2s;
+}
+nav a:hover {
+    color: #ffd700;
+}
+main {
+    max-width: 900px;
+    margin: 32px auto 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 16px #0002;
+    padding: 32px 36px 24px 36px;
+}
+h2 {
+    color: #2d3e50;
+    margin-top: 0;
+}
+ul, ol {
+    margin-top: 0.5em;
+    margin-bottom: 1.5em;
+}
+ul.features {
+    columns: 2;
+    column-gap: 32px;
+    margin-bottom: 1.5em;
+}
+pre {
+    background: #f3f3f3;
+    border-radius: 6px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    font-size: 1em;
+}
+code {
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    color: #2d3e50;
+}
+table.actions {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5em;
+}
+table.actions th, table.actions td {
+    border: 1px solid #e0e0e0;
+    padding: 8px 10px;
+    text-align: left;
+}
+table.actions th {
+    background: #f7f7f7;
+    color: #2d3e50;
+}
+table.actions tr:nth-child(even) {
+    background: #fafbfc;
+}
+details {
+    margin-bottom: 1em;
+    background: #f7f7f7;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+details summary {
+    font-weight: 500;
+    cursor: pointer;
+}
+footer {
+    text-align: center;
+    color: #888;
+    font-size: 0.95em;
+    margin: 32px 0 12px 0;
+}
+button {
+    background: #2d3e50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 18px;
+    font-size: 1em;
+    margin: 10px 0 10px 0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #ffd700;
+    color: #222;
+}
+@media (max-width: 700px) {
+    main {
+        padding: 16px 6px;
+    }
+    nav a {
+        margin: 0 8px;
+        font-size: 1em;
+    }
+    ul.features {
+        columns: 1;
+    }
+}
