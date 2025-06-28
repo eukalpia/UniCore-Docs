@@ -1,123 +1,96 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>UniCore Documentation</title>
-        <meta name="author" content="Умаралиев Равшан Рустамжон угли (eukalpia)">
-        <meta name="description" content="Полная документация UniCore API Gateway на Rust: YAML-конфиг, pipeline, примеры, запуск, FAQ, автор eukalpia.">
-        <link rel="stylesheet" href="style.css">
-        <!-- highlight.js premium theme -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-        <script>hljs.highlightAll();</script>
-        <script>
-          function toggleCode(id) {
-            var el = document.getElementById(id);
-            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-          }
-        </script>
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Документация UniCore API Gateway</title>
+    <meta name="author" content="Умаралиев Равшан Рустамжон угли (eukalpia)">
+    <meta name="description" content="Полная документация по UniCore, высокопроизводительному API Gateway на Rust. Настройка YAML, pipeline, actions, примеры использования, руководство по запуску. Автор: eukalpia.">
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
     <header>
-        <h1>UniCore — Unified Concurrency Reactor</h1>
-        <nav>
-            <a href="#about">О проекте</a>
-            <a href="#features">Возможности</a>
-            <a href="#yaml">YAML-конфиг</a>
-            <a href="#pipeline">Pipeline</a>
-            <a href="#actions">Действия</a>
-            <a href="#examples">Примеры</a>
-            <a href="#faq">FAQ</a>
-            <a href="#run">Запуск</a>
-        </nav>
+        <div class="header-content">
+            <div class="title-block">
+                <h1>UniCore <span class="version">v0.5.0</span></h1>
+                <p class="subtitle">Высокопроизводительный API Gateway на Rust</p>
+            </div>
+            <nav>
+                <a href="#about">О проекте</a>
+                <a href="#run">Быстрый старт</a>
+                <a href="#yaml">Конфигурация</a>
+                <a href="#actions">Действия</a>
+                <div class="lang-switcher">
+                    <a href="index.html" class="active-lang">RU</a> |
+                    <a href="index_en.html">EN</a> |
+                    <a href="index_uz.html">UZ</a>
+                </div>
+            </nav>
+        </div>
     </header>
+
     <main>
         <section id="about">
             <h2>О проекте</h2>
-            <p><b>UniCore</b> (Unified Concurrency Reactor) — профессиональный асинхронный API Gateway на Rust, разработан компанией <b>UniOS</b>. Поддерживает проксирование, балансировку, кэширование, JWT, rate limiting, health-check, горячую перезагрузку и структурированное логирование. <br><br><b>Автор:</b> <a href="https://github.com/eukalpia" target="_blank">Умаралиев Равшан Рустамжон угли (eukalpia)</a></p>
+            <p><b>UniCore</b> — это современный, асинхронный и невероятно быстрый API Gateway, созданный для управления, защиты и масштабирования ваших API. Написанный на Rust, он обеспечивает максимальную производительность и безопасность при минимальном потреблении ресурсов.</p>
+            <p>Проект является центральной частью экосистемы <b>UniOS</b> и разработан для решения реальных задач в микросервисных архитектурах.</p>
+            <p><b>Автор:</b> <a href="https://github.com/eukalpia" target="_blank">Умаралиев Равшан Рустамжон угли (eukalpia)</a></p>
         </section>
+
         <section id="features">
-            <h2>Возможности</h2>
+            <h2>Ключевые возможности</h2>
             <ul class="features">
-                <li>Проксирование HTTP(S) запросов</li>
-                <li>Балансировка нагрузки (round robin, random, ip_hash)</li>
-                <li>Кэширование ответов</li>
-                <li>Rate limiting (по IP/токену/заголовку)</li>
-                <li>JWT-аутентификация (JWKS, файл)</li>
-                <li>Health-check backend-ов</li>
-                <li>Горячая перезагрузка конфига</li>
-                <li>Структурированное логирование</li>
-                <li>Гибкая настройка pipeline</li>
-                <li>Минимальные зависимости</li>
-                <li>Production-ready архитектура</li>
+                <li>Проксирование и балансировка нагрузки</li>
+                <li>Кэширование ответов с TTL</li>
+                <li>Ограничение частоты запросов (Rate Limiting)</li>
+                <li>Проверка "здоровья" бэкендов (Health Checks)</li>
+                <li>JWT-аутентификация (через JWKS)</li>
+                <li>Горячая перезагрузка конфигурации</li>
+                <li>Гибкий конвейер обработки (Pipeline)</li>
+                <li>Поддержка TLS (статического и через ACME)</li>
+                <li>Структурированное логирование в JSON</li>
+                <li>Отдача статических файлов</li>
+                <li>Минимальные зависимости и высокая скорость</li>
             </ul>
         </section>
-        <section id="yaml">
-            <h2>YAML-конфиг: структура</h2>
-            <pre><code>network:
+
+        <section id="run">
+            <h2>Быстрый старт: от нуля до рабочего сервера</h2>
+            <p>Это пошаговое руководство поможет вам запустить UniCore локально за 5 минут.</p>
+            <h4>Шаг 1: Подготовка окружения</h4>
+            <ol>
+                <li><b>Rust:</b> <a href="https://rustup.rs/" target="_blank">Установите через rustup</a>.</li>
+                <li><b>Клонируйте репозиторий:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">git clone https://github.com/eukalpia/UniCore.git
+cd UniCore</code></pre>
+                </li>
+            </ol>
+            <h4>Шаг 2: Генерация ключей и сертификатов</h4>
+            <ol>
+                <li><b>Сгенерируйте ключи для JWT:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">python generate_keys.py</code></pre>
+                </li>
+                <li><b>Сгенерируйте SSL-сертификат (требуется OpenSSL):</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes -subj "/CN=localhost"</code></pre>
+                </li>
+            </ol>
+            <h4>Шаг 3: Создание конфигурации `unicore.yaml`</h4>
+            <p>Создайте файл `unicore.yaml` в корне проекта и вставьте в него эту стартовую конфигурацию:</p>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml"># unicore.yaml - Стартовая конфигурация для локального тестирования
+network:
   listen_address: "127.0.0.1:3000"
   tls:
     cert_path: "cert.pem"
     key_path: "key.pem"
 
 routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
+  - path: "/"
+    methods: [GET]
     pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  # ... другие маршруты ...
-</code></pre>
-            <button onclick="toggleCode('full-yaml')">Показать/Скрыть полный пример</button>
-            <pre id="full-yaml" style="display:none;"><code>network:
-  listen_address: "127.0.0.1:3000"
-  tls:
-    cert_path: "cert.pem"
-    key_path: "key.pem"
+      - type: return_response
+        status: 200
+        body: "🚀 UniCore is up and running!"
 
-routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
-    pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  - path: "/limited"
-    methods: [GET]
-    pipeline:
-      - type: rate_limit
-        by: ip
-        limit: 10
-        window: "1m"
-      - type: return_response
-        status: 200
-        body: "You are within the rate limit!"
-  - path: "/benchmark"
-    methods: [GET]
-    pipeline:
-      - type: return_response
-        status: 200
-        body: "OK"
   - path: "/protected"
     methods: [GET]
     pipeline:
@@ -128,193 +101,111 @@ routes:
       - type: return_response
         status: 200
         headers:
-          Content-Type: "application/json; charset=utf-8"
-        body: '{"message": "Welcome, authenticated user!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-        </section>
-        <section id="pipeline">
-            <h2>Pipeline: Общая схема</h2>
-            <p>Pipeline — это последовательность действий (actions), которые выполняются для каждого запроса. Действия выполняются сверху вниз. <br> <b>Pipeline поддерживает:</b> проксирование, кэш, лимиты, аутентификацию, логику возврата, работу с заголовками, статику и счётчики.</p>
-            <img src="https://raw.githubusercontent.com/egorovdmitry/UniCore/main/docs/pipeline_scheme.svg" alt="Pipeline схема" style="max-width:100%;margin:16px 0;">
-        </section>
-        <section id="actions">
-            <h2>Действия pipeline (actions)</h2>
-            <table class="actions">
-                <tr><th>type</th><th>Описание</th><th>Параметры</th></tr>
-                <tr><td>proxy_pass</td><td>Проксирование на backend-ы</td><td>targets, strategy, health_check</td></tr>
-                <tr><td>response_cache</td><td>Кэширование ответов</td><td>ttl</td></tr>
-                <tr><td>rate_limit</td><td>Ограничение запросов</td><td>by, limit, window</td></tr>
-                <tr><td>jwt_auth</td><td>JWT-аутентификация</td><td>jwks_file/jwks_url, issuer, audience</td></tr>
-                <tr><td>return_response</td><td>Статический ответ</td><td>status, headers, body</td></tr>
-                <tr><td>increment_counter</td><td>Счётчик посещений</td><td>key</td></tr>
-                <tr><td>rewrite_headers</td><td>Изменение/удаление заголовков</td><td>set, remove</td></tr>
-                <tr><td>serve_static</td><td>Отдача статических файлов</td><td>root, strip_prefix</td></tr>
-            </table>
-            <p>Каждое действие можно комбинировать с другими для построения сложных сценариев обработки.</p>
-        </section>
-        <section id="examples">
-            <h2>Примеры конфигов</h2>
-            <h3>Минимальный конфиг</h3>
-            <pre><code>network:
-  listen_address: "127.0.0.1:3000"
-routes:
-  - path: "/"
-    methods: [GET]
-    pipeline:
-      - type: return_response
-        status: 200
-        body: "Hello, world!"
-</code></pre>
-            <h3>JWT-защищённый маршрут</h3>
-            <pre><code>- path: "/protected"
-  methods: [GET]
-  pipeline:
-    - type: jwt_auth
-      jwks_file: "./jwks.json"
-      issuer: "my-local-issuer"
-      audience: "unicore-local-api"
-    - type: return_response
-      status: 200
-      headers:
-        Content-Type: "application/json; charset=utf-8"
-      body: '{"message": "Welcome, authenticated user!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-            <h3>Кэширование и балансировка</h3>
-            <pre><code>- path: "/api"
-  match_prefix: true
-  methods: [GET, POST]
-  pipeline:
-    - type: response_cache
-      ttl: "10s"
-    - type: proxy_pass
-      targets:
-        - "http://localhost:8080"
-        - "http://localhost:8081"
-      strategy: random
-</code></pre>
-        </section>
-        <section id="faq">
-            <h2>FAQ</h2>
-            <details><summary>Как работает hot reload?</summary>
-                <div>Любое изменение <b>unicore.yaml</b> автоматически применяется без перезапуска сервера.</div>
-            </details>
-            <details><summary>Как добавить свой action?</summary>
-                <div>Добавьте новый тип в enum Action в Rust-коде и реализуйте обработку в pipeline_processor.rs.</div>
-            </details>
-            <details><summary>Какой максимальный RPS?</summary>
-                <div>Зависит от железа и ОС. На Linux UniCore может выдавать десятки тысяч RPS на простых маршрутах.</div>
-            </details>
-            <details><summary>Где взять примеры для production?</summary>
-                <div>См. <a href="#examples">раздел примеров</a> и <b>README.md</b> репозитория.</div>
-            </details>
-            <details><summary>Как работает переменные в body/headers?</summary>
-                <div>Можно использовать <code>${counter.key.new_value}</code>, <code>${auth.claims.sub}</code>, <code>${header.X-My-Header}</code> для динамических значений.</div>
-            </details>
-            <details><summary>Как добавить TLS?</summary>
-                <div>Укажите <b>tls</b> в секции <b>network</b> с путями к сертификату и ключу.</div>
-            </details>
-            <details><summary>Как логировать запросы?</summary>
-                <div>Включено по умолчанию через <b>tracing</b>. Можно настроить вывод в файл в main.rs.</div>
-            </details>
-        </section>
-        <section id="run">
-            <h2>Запуск UniCore</h2>
+          Content-Type: "application/json"
+        body: '{"message": "Welcome, ${auth.claims.sub}!"}'</code></pre>
+            <h4>Шаг 4: Сборка и запуск</h4>
             <ol>
-                <li>Установите Rust: <a href="https://rustup.rs/">https://rustup.rs/</a></li>
-                <li>Соберите проект: <code>cargo build --release</code></li>
-                <li>Запустите: <code>cargo run --release</code></li>
-                <li>Изменения в <b>unicore.yaml</b> применяются на лету (hot reload).</li>
+                <li><b>Сборка:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">cargo build --release</code></pre>
+                </li>
+                <li><b>Запуск:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash"># В Windows: .\target\release\unicore.exe
+# В Linux/macOS: ./target/release/unicore</code></pre>
+                </li>
             </ol>
+            <div class="callout note">
+                <p>🚀 <b>Сервер запущен!</b> Теперь вы можете открыть <a href="https://localhost:3000" target="_blank">https://localhost:3000</a> в браузере (игнорируя предупреждение о сертификате) или использовать `curl -k https://localhost:3000`.</p>
+            </div>
         </section>
-        <section id="interaction">
-            <h2>Взаимодействие с UniCore API Gateway</h2>
-            <p>Ниже приведены основные сценарии и примеры кода для работы с UniCore как с API Gateway:</p>
-            <ul>
-                <li><b>Проксирование REST-запросов:</b> UniCore принимает HTTP(S) запросы и перенаправляет их на backend-сервисы. <br>
-                    <b>Пример запроса:</b>
-                    <pre><code class="bash">curl -X GET http://localhost:3000/api/resource</code></pre>
-                </li>
-                <li><b>Балансировка нагрузки:</b> Запросы к одному маршруту равномерно распределяются между backend-ами. <br>
-                    <b>Пример pipeline в YAML:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: proxy_pass
-    targets:
-      - "http://localhost:8080"
-      - "http://localhost:8081"
-    strategy: round_robin</code></pre>
-                </li>
-                <li><b>Кэширование:</b> UniCore кэширует ответы backend-ов для ускорения повторных запросов. <br>
-                    <b>Пример pipeline:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: response_cache
-    ttl: "30s"
-  - type: proxy_pass
-    targets:
-      - "http://localhost:8080"</code></pre>
-                </li>
-                <li><b>Rate limiting:</b> Ограничение количества запросов по IP, токену или заголовку. <br>
-                    <b>Пример pipeline:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: rate_limit
-    by: ip
-    limit: 10
-    window: "1m"
-  - type: return_response
-    status: 200
-    body: "OK"</code></pre>
-                </li>
-                <li><b>JWT-аутентификация:</b> Проверка JWT-токена пользователя. <br>
-                    <b>Пример pipeline:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: jwt_auth
-    jwks_file: "./jwks.json"
-    issuer: "my-local-issuer"
-    audience: "unicore-local-api"
-  - type: return_response
-    status: 200
-    body: "Добро пожаловать, ${auth.claims.sub}!"</code></pre>
-                </li>
-                <li><b>Health-check:</b> Автоматическая проверка доступности backend-ов. <br>
-                    <b>Пример настройки:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: proxy_pass
-    targets:
-      - "http://localhost:8080"
-    health_check:
-      path: "/"
-      interval: "5s"
-      timeout: "2s"</code></pre>
-                </li>
-                <li><b>Работа с переменными:</b> Используйте переменные в body и headers для динамических ответов. <br>
-                    <b>Пример:</b>
-                    <pre><code class="yaml">body: '{"user": "${auth.claims.sub}", "count": "${counter.visits.new_value}"}'</code></pre>
-                </li>
-                <li><b>Ответы без backend:</b> Возврат статических ответов без обращения к backend-у. <br>
-                    <b>Пример:</b>
-                    <pre><code class="yaml">pipeline:
-  - type: return_response
-    status: 200
-    body: "Service is up!"</code></pre>
-                </li>
-            </ul>
-            <h3>Пример ответа с кэшем</h3>
-            <pre><code class="json">{
-  "result": "ok",
-  "cached": true
-}</code></pre>
-            <h3>Пример ответа при превышении лимита</h3>
-            <pre><code class="json">{
-  "error": "Rate limit exceeded"
-}</code></pre>
-            <h3>Пример ответа при успешной JWT-аутентификации</h3>
-            <pre><code class="json">{
-  "message": "Welcome, authenticated user!",
-  "subject": "user_id_123"
-}</code></pre>
+
+        <section id="yaml">
+            <h2>Анатомия `unicore.yaml`</h2>
+            <h3>Секция `network`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">network:
+  listen_address: "0.0.0.0:443"
+  # Вариант 1: Статический TLS
+  tls:
+    cert_path: "cert.pem"
+    key_path: "key.pem"
+  # Вариант 2: Автоматический TLS через Let's Encrypt
+  acme:
+    domains: ["your-domain.com"]
+    contact: "mailto:your-email@example.com"
+    cache_dir: "./acme_cache"
+    production: true</code></pre>
+            <h3>Секция `routes`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">routes:
+  - path: "/api/v1"
+    match_prefix: true
+    methods: [GET, POST]
+    pipeline:
+      - type: ...
+      - type: ...</code></pre>
+        </section>
+
+        <section id="actions">
+            <h2>In-Depth: Действия (Actions)</h2>
+            <p>Pipeline — это сердце UniCore. Вот подробное описание каждого доступного действия.</p>
+            <h3>`proxy_pass`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">- type: proxy_pass
+  targets: ["http://10.0.0.1:8080", "http://10.0.0.2:8080"]
+  strategy: round_robin
+  health_check:
+    path: "/health"
+    interval: "5s"
+    timeout: "2s"</code></pre>
+            <h3>`rate_limit`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">- type: rate_limit
+  requests: 100
+  period: "1m"
+  by: ip</code></pre>
+            <h3>`response_cache`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">- type: response_cache
+  ttl: "5m"</code></pre>
+            <h3>`jwt_auth`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">- type: jwt_auth
+  jwks_file: "./jwks.json" # или jwks_url: "https://.../.well-known/jwks.json"
+  issuer: "my-auth-server"
+  audience: "my-api"</code></pre>
+            <h3>`return_response`</h3>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml">- type: return_response
+  status: 200
+  headers: {Content-Type: "application/json"}
+  body: '{"status": "ok", "user": "${auth.claims.sub}"}'</code></pre>
+        </section>
+
+        <section id="faq">
+            <h2>Часто задаваемые вопросы (FAQ)</h2>
+            <details><summary>В чем разница между `cargo run` и запуском `target/release/unicore`?</summary>
+                <div><code>cargo run</code> запускает отладочную, неоптимизированную версию. <code>target/release/unicore</code> — это скомпилированный с максимальными оптимизациями бинарник. Он работает в разы быстрее и предназначен для production.</div>
+            </details>
+            <details><summary>Как UniCore находит реальный IP-адрес клиента за прокси?</summary>
+                <div>UniCore автоматически парсит стандартные заголовки `Forwarded` и `X-Forwarded-For` для определения исходного IP-адреса.</div>
+            </details>
+            <details><summary>Что произойдет, если все бэкенды в `proxy_pass` станут нерабочими?</summary>
+                <div>Если включен `health_check` и все таргеты помечены как UNHEALTHY, UniCore будет немедленно возвращать клиенту ответ `503 Service Unavailable`.</div>
+            </details>
         </section>
     </main>
+
     <footer>
-        <p>UniCore &copy; 2025. Компания <b>UniOS</b>. Автор: <a href="https://github.com/eukalpia" target="_blank">Умаралиев Равшан Рустамжон угли (eukalpia)</a>. Документация для GitHub Pages.</p>
+        <p>UniCore © 2025. Разработано в <b>UniOS</b>. <br>Автор: <a href="https://github.com/eukalpia" target="_blank">Умаралиев Равшан Рустамжон угли (eukalpia)</a>.</p>
     </footer>
+
+    <script>
+        document.querySelectorAll('pre').forEach(pre => {
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.innerText = 'Copy';
+            button.addEventListener('click', () => {
+                const code = pre.querySelector('code').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
+            });
+            pre.appendChild(button);
+        });
+    </script>
 </body>
 </html>

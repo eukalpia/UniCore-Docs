@@ -3,229 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniCore Documentation</title>
+    <title>UniCore API Gateway Documentation</title>
     <meta name="author" content="Ravshan Rustamjon ugli Umaraliev (eukalpia)">
-    <meta name="description" content="Full documentation for UniCore API Gateway in Rust: YAML config, pipeline, examples, launch, FAQ, author eukalpia.">
+    <meta name="description" content="Complete documentation for UniCore, a high-performance API Gateway in Rust. YAML config, pipeline, actions, usage examples, getting started guide. Author: eukalpia.">
     <link rel="stylesheet" href="style.css">
-    <script>
-      function toggleCode(id) {
-        var el = document.getElementById(id);
-        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-      }
-    </script>
 </head>
 <body>
     <header>
-        <h1>UniCore — Documentation</h1>
-        <nav>
-            <a href="#about">About</a>
-            <a href="#features">Features</a>
-            <a href="#yaml">YAML Config</a>
-            <a href="#pipeline">Pipeline</a>
-            <a href="#actions">Actions</a>
-            <a href="#examples">Examples</a>
-            <a href="#faq">FAQ</a>
-            <a href="#run">Getting Started</a>
-            <a href="index.html">RU</a> | <a href="index_uz.html">UZ</a>
-        </nav>
+        <div class="header-content">
+            <div class="title-block">
+                <h1>UniCore <span class="version">v0.5.0</span></h1>
+                <p class="subtitle">A High-Performance API Gateway in Rust</p>
+            </div>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#run">Getting Started</a>
+                <a href="#yaml">Configuration</a>
+                <a href="#actions">Actions</a>
+                <div class="lang-switcher">
+                    <a href="index.html">RU</a> |
+                    <a href="index_en.html" class="active-lang">EN</a> |
+                    <a href="index_uz.html">UZ</a>
+                </div>
+            </nav>
+        </div>
     </header>
+
     <main>
         <section id="about">
-            <h2>About</h2>
-            <p><b>UniCore</b> is a professional asynchronous API Gateway written in Rust. Supports proxying, load balancing, caching, JWT, rate limiting, health-check, hot reload, and structured logging.<br><br><b>Author:</b> <a href="https://github.com/eukalpia" target="_blank">Ravshan Rustamjon ugli Umaraliev (eukalpia)</a></p>
+            <h2>About The Project</h2>
+            <p><b>UniCore</b> is a modern, asynchronous, and incredibly fast API Gateway designed to manage, secure, and scale your APIs. Written in Rust, it provides maximum performance and security with minimal resource consumption.</p>
+            <p>The project is a central part of the <b>UniOS</b> ecosystem and is designed to solve real-world problems in microservice architectures.</p>
+            <p><b>Author:</b> <a href="https://github.com/eukalpia" target="_blank">Ravshan Rustamjon ugli Umaraliev (eukalpia)</a></p>
         </section>
+
         <section id="features">
-            <h2>Features</h2>
+            <h2>Key Features</h2>
             <ul class="features">
-                <li>HTTP(S) proxying</li>
-                <li>Load balancing (round robin, random, ip_hash)</li>
-                <li>Response caching</li>
-                <li>Rate limiting (by IP/token/header)</li>
-                <li>JWT authentication (JWKS, file)</li>
-                <li>Backend health-check</li>
-                <li>Hot reload config</li>
-                <li>Structured logging</li>
-                <li>Flexible pipeline</li>
-                <li>Minimal dependencies</li>
-                <li>Production-ready architecture</li>
+                <li>Proxying & Load Balancing</li>
+                <li>Response Caching with TTL</li>
+                <li>Rate Limiting</li>
+                <li>Backend Health Checks</li>
+                <li>JWT Authentication (via JWKS)</li>
+                <li>Hot Reloading of Configuration</li>
+                <li>Flexible Processing Pipeline</li>
+                <li>TLS Support (Static & ACME)</li>
+                <li>Structured JSON Logging</li>
+                <li>Static File Serving</li>
+                <li>Minimal Dependencies & High Speed</li>
             </ul>
         </section>
-        <section id="yaml">
-            <h2>YAML Config: Structure</h2>
-            <pre><code>network:
+
+        <section id="run">
+            <h2>Getting Started: Zero to a Running Server in 5 Minutes</h2>
+            <p>This step-by-step guide will help you run UniCore locally.</p>
+            <h4>Step 1: Prepare Your Environment</h4>
+            <ol>
+                <li><b>Rust:</b> <a href="https://rustup.rs/" target="_blank">Install via rustup</a>.</li>
+                <li><b>Clone the repository:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">git clone https://github.com/eukalpia/UniCore.git
+cd UniCore</code></pre>
+                </li>
+            </ol>
+            <h4>Step 2: Generate Keys and Certificates</h4>
+            <ol>
+                <li><b>Generate JWT keys:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">python generate_keys.py</code></pre>
+                </li>
+                <li><b>Generate a self-signed SSL certificate (requires OpenSSL):</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes -subj "/CN=localhost"</code></pre>
+                </li>
+            </ol>
+            <h4>Step 3: Create `unicore.yaml` Configuration</h4>
+            <p>Create a `unicore.yaml` file in the project root with this starting configuration:</p>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml"># unicore.yaml - Starter configuration for local testing
+network:
   listen_address: "127.0.0.1:3000"
   tls:
     cert_path: "cert.pem"
     key_path: "key.pem"
 
-routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
-    pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  # ... other routes ...
-</code></pre>
-            <button onclick="toggleCode('full-yaml')">Show/Hide full example</button>
-            <pre id="full-yaml" style="display:none;"><code>network:
-  listen_address: "127.0.0.1:3000"
-  tls:
-    cert_path: "cert.pem"
-    key_path: "key.pem"
-
-routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
-    pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  - path: "/limited"
-    methods: [GET]
-    pipeline:
-      - type: rate_limit
-        by: ip
-        limit: 10
-        window: "1m"
-      - type: return_response
-        status: 200
-        body: "You are within the rate limit!"
-  - path: "/benchmark"
-    methods: [GET]
-    pipeline:
-      - type: return_response
-        status: 200
-        body: "OK"
-  - path: "/protected"
-    methods: [GET]
-    pipeline:
-      - type: jwt_auth
-        jwks_file: "./jwks.json"
-        issuer: "my-local-issuer"
-        audience: "unicore-local-api"
-      - type: return_response
-        status: 200
-        headers:
-          Content-Type: "application/json; charset=utf-8"
-        body: '{"message": "Welcome, authenticated user!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-        </section>
-        <section id="pipeline">
-            <h2>Pipeline: General Scheme</h2>
-            <p>Pipeline is a sequence of actions performed for each request. Actions are executed top-down.<br> <b>Pipeline supports:</b> proxying, cache, limits, authentication, response logic, header manipulation, static files, counters.</p>
-            <img src="https://raw.githubusercontent.com/egorovdmitry/UniCore/main/docs/pipeline_scheme.svg" alt="Pipeline scheme" style="max-width:100%;margin:16px 0;">
-        </section>
-        <section id="actions">
-            <h2>Pipeline Actions</h2>
-            <table class="actions">
-                <tr><th>type</th><th>Description</th><th>Parameters</th></tr>
-                <tr><td>proxy_pass</td><td>Proxy to backends</td><td>targets, strategy, health_check</td></tr>
-                <tr><td>response_cache</td><td>Response caching</td><td>ttl</td></tr>
-                <tr><td>rate_limit</td><td>Rate limiting</td><td>by, limit, window</td></tr>
-                <tr><td>jwt_auth</td><td>JWT authentication</td><td>jwks_file/jwks_url, issuer, audience</td></tr>
-                <tr><td>return_response</td><td>Static response</td><td>status, headers, body</td></tr>
-                <tr><td>increment_counter</td><td>Visit counter</td><td>key</td></tr>
-                <tr><td>rewrite_headers</td><td>Header manipulation</td><td>set, remove</td></tr>
-                <tr><td>serve_static</td><td>Static file serving</td><td>root, strip_prefix</td></tr>
-            </table>
-            <p>Each action can be combined with others to build complex request processing scenarios.</p>
-        </section>
-        <section id="examples">
-            <h2>Config Examples</h2>
-            <h3>Minimal config</h3>
-            <pre><code>network:
-  listen_address: "127.0.0.1:3000"
 routes:
   - path: "/"
     methods: [GET]
     pipeline:
       - type: return_response
         status: 200
-        body: "Hello, world!"
-</code></pre>
-            <h3>JWT-protected route</h3>
-            <pre><code>- path: "/protected"
-  methods: [GET]
-  pipeline:
-    - type: jwt_auth
-      jwks_file: "./jwks.json"
-      issuer: "my-local-issuer"
-      audience: "unicore-local-api"
-    - type: return_response
-      status: 200
-      headers:
-        Content-Type: "application/json; charset=utf-8"
-      body: '{"message": "Welcome, authenticated user!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-            <h3>Caching and load balancing</h3>
-            <pre><code>- path: "/api"
-  match_prefix: true
-  methods: [GET, POST]
-  pipeline:
-    - type: response_cache
-      ttl: "10s"
-    - type: proxy_pass
-      targets:
-        - "http://localhost:8080"
-        - "http://localhost:8081"
-      strategy: random
-</code></pre>
+        body: "🚀 UniCore is up and running!"</code></pre>
+            <h4>Step 4: Build and Run</h4>
+            <ol>
+                <li><b>Build:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">cargo build --release</code></pre>
+                </li>
+                <li><b>Run:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash"># On Windows: .\target\release\unicore.exe
+# On Linux/macOS: ./target/release/unicore</code></pre>
+                </li>
+            </ol>
+            <div class="callout note">
+                <p>🚀 <b>Server is running!</b> You can now open <a href="https://localhost:3000" target="_blank">https://localhost:3000</a> in your browser (ignoring the certificate warning) or use `curl -k https://localhost:3000`.</p>
+            </div>
+        </section>
+        
+        <section id="yaml">
+            <h2>YAML Anatomy</h2>
+            <p>The configuration file consists of two main sections: <b>network</b> and <b>routes</b>.</p>
+            <h3><code>network</code> section</h3>
+            <p>Defines where and how the server will listen for connections.</p>
+            <pre><code class="language-yaml">network:
+  listen_address: "0.0.0.0:443"
+  # Option 1: Static TLS (for local/testing)
+  tls:
+    cert_path: "cert.pem"
+    key_path: "key.pem"
+  # Option 2: Automatic TLS via ACME (for production)
+  acme:
+    domains:
+      - "your-domain.com"
+      - "www.your-domain.com"
+    contact: "mailto:your-email@example.com"
+    cache_dir: "./acme_cache"
+    production: true</code></pre>
+            <h3><code>routes</code> section</h3>
+            <p>This is an array of routes. UniCore checks each incoming request against this list from top to bottom and uses the first matching route.</p>
+            <pre><code class="language-yaml">routes:
+  - path: "/api/v1"
+    match_prefix: true
+    methods: [GET, POST]
+    pipeline:
+      - type: ...
+      - type: ...</code></pre>
+        </section>
+        <section id="actions">
+            <h2>In-Depth: Actions</h2>
+            <p>The pipeline is the heart of UniCore. Here is a detailed description of each available action.</p>
+            <h3><code>proxy_pass</code></h3>
+            <p>Forwards the request to one of the backend services with load balancing and health checking.</p>
+            <pre><code class="language-yaml">- type: proxy_pass
+  targets: ["http://10.0.0.1:8080", "http://10.0.0.2:8080"]
+  strategy: round_robin
+  health_check:
+    path: "/health"
+    interval: "5s"
+    timeout: "2s"</code></pre>
+            <ul>
+                <li><code>targets</code>: List of your backend service addresses.</li>
+                <li><code>strategy</code>: Load balancing strategy. Currently, <code>round_robin</code> is available.</li>
+                <li><code>health_check</code>: (Optional) Enables health checking.
+                    <ul>
+                        <li><code>path</code>: Path on the backend to poll (should return 200 OK).</li>
+                        <li><code>interval</code>: How often to check (e.g., "5s", "1m").</li>
+                        <li><code>timeout</code>: How long to wait for a health check response.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h3><code>rate_limit</code></h3>
+            <p>Limits the number of requests from a single client over a period of time.</p>
+            <pre><code class="language-yaml">- type: rate_limit
+  requests: 100
+  period: "1m"
+  by: ip</code></pre>
+            <ul>
+                <li><code>requests</code>: Maximum number of requests.</li>
+                <li><code>period</code>: Time window (e.g., "1s", "1m", "1h").</li>
+                <li><code>by</code>: How to identify the client. Currently, <code>ip</code> is available.</li>
+            </ul>
+            <div class="callout note"><p>If the limit is exceeded, UniCore returns <code>429 Too Many Requests</code>.</p></div>
+            <h3><code>response_cache</code></h3>
+            <p>Caches successful GET responses to speed up repeated requests.</p>
+            <pre><code class="language-yaml">- type: response_cache
+  ttl: "5m"</code></pre>
+            <ul>
+                <li><code>ttl</code>: Cache time-to-live.</li>
+            </ul>
+            <h3><code>jwt_auth</code></h3>
+            <p>Checks JWT in the <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
+            <pre><code class="language-yaml">- type: jwt_auth
+  jwks_file: "./jwks.json" # or jwks_url: "https://.../.well-known/jwks.json"
+  issuer: "my-auth-server"
+  audience: "my-api"</code></pre>
+            <ul>
+                <li><code>jwks_file</code> / <code>jwks_url</code>: Source of keys for signature verification. Specify one.</li>
+                <li><code>issuer</code>: (Optional) Checks the <code>iss</code> field in the token.</li>
+                <li><code>audience</code>: (Optional) Checks the <code>aud</code> field in the token.</li>
+            </ul>
+            <h3><code>return_response</code></h3>
+            <p>Immediately returns a static response. Usually used at the end of the pipeline.</p>
+            <pre><code class="language-yaml">- type: return_response
+  status: 200
+  headers:
+    Content-Type: "application/json"
+  body: '{"status": "ok", "user": "${auth.claims.sub}"}'</code></pre>
+            <ul>
+                <li><code>status</code>: HTTP status code.</li>
+                <li><code>headers</code>: (Optional) Map of headers.</li>
+                <li><code>body</code>: Response body. Supports variables.</li>
+            </ul>
+            <div class="callout note"><p><b>Variables in <code>body</code>:</b> You can insert dynamic values obtained in previous actions, e.g., <code>${auth.claims.sub}</code> after <code>jwt_auth</code> or <code>${counter.my_key.new_value}</code> after <code>increment_counter</code>.</p></div>
+            <h3>Other actions</h3>
+            <p>Also available: <code>serve_static</code> (static files), <code>rewrite_headers</code> (header modification), and <code>increment_counter</code> (atomic counter).</p>
         </section>
         <section id="faq">
-            <h2>FAQ</h2>
-            <details><summary>How does hot reload work?</summary>
-                <div>Any change to <b>unicore.yaml</b> is applied automatically without restarting the server.</div>
+            <h2>Frequently Asked Questions (FAQ)</h2>
+            <details>
+                <summary>What is the difference between <code>cargo run</code> and running <code>target/release/unicore</code>?</summary>
+                <div><code>cargo run</code> launches a debug, unoptimized build. It compiles quickly but runs slower. <code>target/release/unicore</code> is a fully optimized binary for production. Always use the release build for performance testing and deployment.</div>
             </details>
-            <details><summary>How to add a custom action?</summary>
-                <div>Add a new type to the Action enum in Rust and implement it in pipeline_processor.rs.</div>
+            <details>
+                <summary>How does UniCore determine the real client IP behind a proxy?</summary>
+                <div>UniCore automatically parses standard <code>Forwarded</code> and <code>X-Forwarded-For</code> headers to determine the original client IP. This allows <code>rate_limit</code> to work correctly even if UniCore is behind another load balancer.</div>
             </details>
-            <details><summary>What is the maximum RPS?</summary>
-                <div>Depends on hardware and OS. On Linux, UniCore can deliver tens of thousands of RPS on simple routes.</div>
-            </details>
-            <details><summary>Where to find production examples?</summary>
-                <div>See the <a href="#examples">examples section</a> and the repository <b>README.md</b>.</div>
-            </details>
-            <details><summary>How do variables in body/headers work?</summary>
-                <div>You can use <code>${counter.key.new_value}</code>, <code>${auth.claims.sub}</code>, <code>${header.X-My-Header}</code> for dynamic values.</div>
-            </details>
-            <details><summary>How to enable TLS?</summary>
-                <div>Specify <b>tls</b> in the <b>network</b> section with certificate and key paths.</div>
-            </details>
-            <details><summary>How to log requests?</summary>
-                <div>Enabled by default via <b>tracing</b>. You can configure file output in main.rs.</div>
+            <details>
+                <summary>What happens if all backends in <code>proxy_pass</code> become unhealthy?</summary>
+                <div>If <code>health_check</code> is enabled and all targets are marked as UNHEALTHY, UniCore will immediately return <code>503 Service Unavailable</code> to the client, protecting your system from cascading failures.</div>
             </details>
         </section>
-        <section id="run">
-            <h2>Getting Started</h2>
-            <ol>
-                <li>Install Rust: <a href="https://rustup.rs/">https://rustup.rs/</a></li>
-                <li>Build the project: <code>cargo build --release</code></li>
-                <li>Run: <code>cargo run --release</code></li>
-                <li>Changes in <b>unicore.yaml</b> are applied on the fly (hot reload).</li>
-            </ol>
-        </section>
+
     </main>
+
     <footer>
-        <p>UniCore &copy; 2025. Author: <a href="https://github.com/eukalpia" target="_blank">Ravshan Rustamjon ugli Umaraliev (eukalpia)</a>. Documentation for GitHub Pages.</p>
+        <p>UniCore © 2025. Developed at <b>UniOS</b>. <br>Author: <a href="https://github.com/eukalpia" target="_blank">Ravshan Rustamjon ugli Umaraliev (eukalpia)</a>.</p>
     </footer>
+
+    <script>
+        document.querySelectorAll('pre').forEach(pre => {
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.innerText = 'Copy';
+            button.addEventListener('click', () => {
+                const code = pre.querySelector('code').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
+            });
+            pre.appendChild(button);
+        });
+    </script>
 </body>
 </html>

@@ -3,229 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniCore Hujjatlari</title>
-    <meta name="author" content="Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)">
-    <meta name="description" content="To‘liq UniCore API Gateway hujjatlari: YAML konfiguratsiya, pipeline, misollar, ishga tushirish, FAQ, muallif eukalpia.">
+    <title>UniCore API Gateway Hujjatlari</title>
+    <meta name="author" content="Umaraliyev Ravshan Rustamjon o‘g‘li (eukalpia)">
+    <meta name="description" content="Rust tilidagi yuqori unumdorlikka ega UniCore API Gateway uchun to'liq hujjatlar. YAML sozlamalari, pipeline, amallar, foydalanish misollari, ishga tushirish qo'llanmasi. Muallif: eukalpia.">
     <link rel="stylesheet" href="style.css">
-    <script>
-      function toggleCode(id) {
-        var el = document.getElementById(id);
-        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-      }
-    </script>
 </head>
 <body>
     <header>
-        <h1>UniCore — Hujjatlar</h1>
-        <nav>
-            <a href="#about">Loyiha haqida</a>
-            <a href="#features">Imkoniyatlar</a>
-            <a href="#yaml">YAML konfiguratsiya</a>
-            <a href="#pipeline">Pipeline</a>
-            <a href="#actions">Amallar</a>
-            <a href="#examples">Misollar</a>
-            <a href="#faq">FAQ</a>
-            <a href="#run">Ishga tushirish</a>
-            <a href="index.html">RU</a> | <a href="index_en.html">EN</a>
-        </nav>
+        <div class="header-content">
+            <div class="title-block">
+                <h1>UniCore <span class="version">v0.5.0</span></h1>
+                <p class="subtitle">Rust tilida yuqori unumdorlikka ega API Gateway</p>
+            </div>
+            <nav>
+                <a href="#about">Loyiha haqida</a>
+                <a href="#run">Tezkor start</a>
+                <a href="#yaml">Konfiguratsiya</a>
+                <a href="#actions">Amallar</a>
+                <div class="lang-switcher">
+                    <a href="index.html">RU</a> |
+                    <a href="index_en.html">EN</a> |
+                    <a href="index_uz.html" class="active-lang">UZ</a>
+                </div>
+            </nav>
+        </div>
     </header>
+
     <main>
         <section id="about">
             <h2>Loyiha haqida</h2>
-            <p><b>UniCore</b> — Rust tilida yozilgan professional asinxron API Gateway. Proxy, balanslash, kesh, JWT, rate limiting, health-check, hot reload va strukturalangan loglarni qo‘llab-quvvatlaydi.<br><br><b>Muallif:</b> <a href="https://github.com/eukalpia" target="_blank">Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a></p>
+            <p><b>UniCore</b> — bu sizning API'laringizni boshqarish, himoyalash va masshtablash uchun yaratilgan zamonaviy, asinxron va aqlbovar qilmas darajada tezkor API Gateway. Rust tilida yozilgan bo'lib, u minimal resurs sarfi bilan maksimal unumdorlik va xavfsizlikni ta'minlaydi.</p>
+            <p>Loyiha <b>UniOS</b> ekotizimining markaziy qismi bo'lib, mikrosxemali arxitekturalardagi real vazifalarni hal qilish uchun ishlab chiqilgan.</p>
+            <p><b>Muallif:</b> <a href="https://github.com/eukalpia" target="_blank">Umaraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a></p>
         </section>
+
         <section id="features">
-            <h2>Imkoniyatlar</h2>
+            <h2>Asosiy imkoniyatlar</h2>
             <ul class="features">
-                <li>HTTP(S) proksi</li>
-                <li>Yuklamani balanslash (round robin, random, ip_hash)</li>
-                <li>Javoblarni kesh qilish</li>
-                <li>Rate limiting (IP/token/header bo‘yicha)</li>
-                <li>JWT autentifikatsiya (JWKS, fayl)</li>
-                <li>Backend health-check</li>
-                <li>Hot reload konfiguratsiya</li>
-                <li>Strukturalangan loglar</li>
-                <li>Flexible pipeline</li>
-                <li>Minimal bog‘liqliklar</li>
-                <li>Production-ready arxitektura</li>
+                <li>Proksi va yuklamani balanslash</li>
+                <li>Javoblarni TTL bilan kesh qilish</li>
+                <li>So'rovlar chastotasini cheklash (Rate Limiting)</li>
+                <li>Backend'lar "salomatligini" tekshirish (Health Checks)</li>
+                <li>JWT-autentifikatsiya (JWKS orqali)</li>
+                <li>Konfiguratsiyani "issiq" qayta yuklash</li>
+                <li>Moslashuvchan qayta ishlash konveyeri (Pipeline)</li>
+                <li>TLS qo'llab-quvvatlashi (statik va ACME orqali)</li>
+                <li>JSON formatida strukturalangan loglar</li>
+                <li>Statik fayllarni uzatish</li>
+                <li>Minimal bog'liqliklar va yuqori tezlik</li>
             </ul>
         </section>
-        <section id="yaml">
-            <h2>YAML konfiguratsiya: Tuzilishi</h2>
-            <pre><code>network:
+
+        <section id="run">
+            <h2>Tezkor start: Noldan ishlaydigan servergacha 5 daqiqada</h2>
+            <p>Ushbu qadamma-qadam qo'llanma UniCore'ni mahalliy kompyuteringizda ishga tushirishga yordam beradi.</p>
+            <h4>1-qadam: Muhitni tayyorlash</h4>
+            <ol>
+                <li><b>Rust:</b> <a href="https://rustup.rs/" target="_blank">Rustup orqali o'rnating</a>.</li>
+                <li><b>Repozitoriyni klonlang:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">git clone https://github.com/eukalpia/UniCore.git
+cd UniCore</code></pre>
+                </li>
+            </ol>
+            <h4>2-qadam: Kalitlar va sertifikatlarni yaratish</h4>
+            <ol>
+                <li><b>JWT uchun kalitlarni yarating:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">python generate_keys.py</code></pre>
+                </li>
+                <li><b>SSL-sertifikat yarating (OpenSSL talab qilinadi):</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes -subj "/CN=localhost"</code></pre>
+                </li>
+            </ol>
+            <h4>3-qadam: `unicore.yaml` konfiguratsiyasini yaratish</h4>
+            <p>Loyiha ildizida `unicore.yaml` faylini yarating va unga ushbu boshlang'ich konfiguratsiyani joylashtiring:</p>
+            <pre><button class="copy-button">Copy</button><code class="language-yaml"># unicore.yaml - Mahalliy test uchun boshlang'ich konfiguratsiya
+network:
   listen_address: "127.0.0.1:3000"
   tls:
     cert_path: "cert.pem"
     key_path: "key.pem"
 
-routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
-    pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  # ... boshqa marshrutlar ...
-</code></pre>
-            <button onclick="toggleCode('full-yaml')">To‘liq misolni ko‘rsatish/yashirish</button>
-            <pre id="full-yaml" style="display:none;"><code>network:
-  listen_address: "127.0.0.1:3000"
-  tls:
-    cert_path: "cert.pem"
-    key_path: "key.pem"
-
-routes:
-  - path: "/api"
-    match_prefix: true
-    methods: [GET, POST, PUT, DELETE]
-    pipeline:
-      - type: response_cache
-        ttl: "30s"
-      - type: proxy_pass
-        targets:
-          - "http://localhost:8080"
-          - "http://localhost:8081"
-        strategy: round_robin
-        health_check:
-          path: "/"
-          interval: "5s"
-          timeout: "2s"
-  - path: "/limited"
-    methods: [GET]
-    pipeline:
-      - type: rate_limit
-        by: ip
-        limit: 10
-        window: "1m"
-      - type: return_response
-        status: 200
-        body: "Siz limit ichidasiz!"
-  - path: "/benchmark"
-    methods: [GET]
-    pipeline:
-      - type: return_response
-        status: 200
-        body: "OK"
-  - path: "/protected"
-    methods: [GET]
-    pipeline:
-      - type: jwt_auth
-        jwks_file: "./jwks.json"
-        issuer: "my-local-issuer"
-        audience: "unicore-local-api"
-      - type: return_response
-        status: 200
-        headers:
-          Content-Type: "application/json; charset=utf-8"
-        body: '{"message": "Xush kelibsiz, autentifikatsiyadan o‘tgan foydalanuvchi!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-        </section>
-        <section id="pipeline">
-            <h2>Pipeline: Umumiy sxema</h2>
-            <p>Pipeline — bu har bir so‘rov uchun bajariladigan amallar ketma-ketligi. Amallar yuqoridan pastga bajariladi.<br> <b>Pipeline quyidagilarni qo‘llab-quvvatlaydi:</b> proksi, kesh, limitlar, autentifikatsiya, javob logikasi, headerlar bilan ishlash, statik fayllar, hisoblagichlar.</p>
-            <img src="https://raw.githubusercontent.com/egorovdmitry/UniCore/main/docs/pipeline_scheme.svg" alt="Pipeline sxemasi" style="max-width:100%;margin:16px 0;">
-        </section>
-        <section id="actions">
-            <h2>Pipeline amallari</h2>
-            <table class="actions">
-                <tr><th>type</th><th>Tavsif</th><th>Parametrlar</th></tr>
-                <tr><td>proxy_pass</td><td>Backendlarga proksi</td><td>targets, strategy, health_check</td></tr>
-                <tr><td>response_cache</td><td>Javoblarni kesh qilish</td><td>ttl</td></tr>
-                <tr><td>rate_limit</td><td>So‘rovlarni cheklash</td><td>by, limit, window</td></tr>
-                <tr><td>jwt_auth</td><td>JWT autentifikatsiya</td><td>jwks_file/jwks_url, issuer, audience</td></tr>
-                <tr><td>return_response</td><td>Statik javob</td><td>status, headers, body</td></tr>
-                <tr><td>increment_counter</td><td>Hisoblagich</td><td>key</td></tr>
-                <tr><td>rewrite_headers</td><td>Headerlarni o‘zgartirish</td><td>set, remove</td></tr>
-                <tr><td>serve_static</td><td>Statik fayllarni berish</td><td>root, strip_prefix</td></tr>
-            </table>
-            <p>Har bir amal boshqalar bilan birga ishlatilishi mumkin — murakkab so‘rovlarni qayta ishlash uchun.</p>
-        </section>
-        <section id="examples">
-            <h2>Konfiguratsiya misollari</h2>
-            <h3>Minimal konfiguratsiya</h3>
-            <pre><code>network:
-  listen_address: "127.0.0.1:3000"
 routes:
   - path: "/"
     methods: [GET]
     pipeline:
       - type: return_response
         status: 200
-        body: "Salom, dunyo!"
-</code></pre>
-            <h3>JWT bilan himoyalangan marshrut</h3>
-            <pre><code>- path: "/protected"
-  methods: [GET]
-  pipeline:
-    - type: jwt_auth
-      jwks_file: "./jwks.json"
-      issuer: "my-local-issuer"
-      audience: "unicore-local-api"
-    - type: return_response
-      status: 200
-      headers:
-        Content-Type: "application/json; charset=utf-8"
-      body: '{"message": "Xush kelibsiz, autentifikatsiyadan o‘tgan foydalanuvchi!", "subject": "${auth.claims.sub}"}'
-</code></pre>
-            <h3>Kesh va balanslash</h3>
-            <pre><code>- path: "/api"
-  match_prefix: true
-  methods: [GET, POST]
-  pipeline:
-    - type: response_cache
-      ttl: "10s"
-    - type: proxy_pass
-      targets:
-        - "http://localhost:8080"
-        - "http://localhost:8081"
-      strategy: random
-</code></pre>
+        body: "🚀 UniCore ishga tushirildi!"</code></pre>
+            <h4>4-qadam: Yig'ish va ishga tushirish</h4>
+            <ol>
+                <li><b>Yig'ish:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash">cargo build --release</code></pre>
+                </li>
+                <li><b>Ishga tushirish:</b>
+                    <pre><button class="copy-button">Copy</button><code class="language-bash"># Windows'da: .\target\release\unicore.exe
+# Linux/macOS'da: ./target/release/unicore</code></pre>
+                </li>
+            </ol>
+            <div class="callout note">
+                <p>🚀 <b>Server ishlamoqda!</b> Endi brauzerda <a href="https://localhost:3000" target="_blank">https://localhost:3000</a> manzilini ochishingiz mumkin (sertifikat haqidagi ogohlantirishni e'tiborsiz qoldiring).</p>
+            </div>
+        </section>
+
+        <section id="yaml">
+            <h2>YAML anatomiyasi</h2>
+            <p>Konfiguratsiya fayli ikkita asosiy bo'limdan iborat: <b>network</b> va <b>routes</b>.</p>
+            <h3><code>network</code> bo'limi</h3>
+            <p>Server qayerda va qanday ishlashini belgilaydi.</p>
+            <pre><code class="language-yaml">network:
+  listen_address: "0.0.0.0:443"
+  # 1-variant: Statik TLS (lokal/test uchun)
+  tls:
+    cert_path: "cert.pem"
+    key_path: "key.pem"
+  # 2-variant: ACME orqali avtomatik TLS (prod uchun)
+  acme:
+    domains:
+      - "your-domain.com"
+      - "www.your-domain.com"
+    contact: "mailto:your-email@example.com"
+    cache_dir: "./acme_cache"
+    production: true</code></pre>
+            <h3><code>routes</code> bo'limi</h3>
+            <p>Bu marshrutlar ro'yxati. Har bir so'rov yuqoridan pastga tekshiriladi va birinchi mos kelgan marshrut ishlatiladi.</p>
+            <pre><code class="language-yaml">routes:
+  - path: "/api/v1"
+    match_prefix: true
+    methods: [GET, POST]
+    pipeline:
+      - type: ...
+      - type: ...</code></pre>
+        </section>
+        <section id="actions">
+            <h2>Batafsil: Amallar (Actions)</h2>
+            <p>Pipeline — bu UniCore'ning yuragi. Quyida har bir amal haqida batafsil ma'lumot.</p>
+            <h3><code>proxy_pass</code></h3>
+            <p>So'rovlarni backend xizmatlarga uzatadi, balanslash va health-check bilan.</p>
+            <pre><code class="language-yaml">- type: proxy_pass
+  targets: ["http://10.0.0.1:8080", "http://10.0.0.2:8080"]
+  strategy: round_robin
+  health_check:
+    path: "/health"
+    interval: "5s"
+    timeout: "2s"</code></pre>
+            <ul>
+                <li><code>targets</code>: Backend manzillar ro'yxati.</li>
+                <li><code>strategy</code>: Balanslash strategiyasi (masalan, <code>round_robin</code>).</li>
+                <li><code>health_check</code>: (Ixtiyoriy) Sog'liqni tekshirish sozlamalari.</li>
+            </ul>
+            <h3><code>rate_limit</code></h3>
+            <p>Bir mijozdan keladigan so'rovlar sonini cheklaydi.</p>
+            <pre><code class="language-yaml">- type: rate_limit
+  requests: 100
+  period: "1m"
+  by: ip</code></pre>
+            <ul>
+                <li><code>requests</code>: Maksimal so'rovlar soni.</li>
+                <li><code>period</code>: Vaqt oralig'i.</li>
+                <li><code>by</code>: Mijozni aniqlash mezoni (masalan, <code>ip</code>).</li>
+            </ul>
+            <h3><code>response_cache</code></h3>
+            <p>GET so'rovlar uchun javoblarni kesh qiladi.</p>
+            <pre><code class="language-yaml">- type: response_cache
+  ttl: "5m"</code></pre>
+            <ul>
+                <li><code>ttl</code>: Kesh muddati.</li>
+            </ul>
+            <h3><code>jwt_auth</code></h3>
+            <p>Authorization: Bearer <token> orqali JWT tekshiradi.</p>
+            <pre><code class="language-yaml">- type: jwt_auth
+  jwks_file: "./jwks.json"
+  issuer: "my-auth-server"
+  audience: "my-api"</code></pre>
+            <ul>
+                <li><code>jwks_file</code> / <code>jwks_url</code>: Kalitlar manbasi.</li>
+                <li><code>issuer</code>: (Ixtiyoriy) <code>iss</code> maydonini tekshiradi.</li>
+                <li><code>audience</code>: (Ixtiyoriy) <code>aud</code> maydonini tekshiradi.</li>
+            </ul>
+            <h3><code>return_response</code></h3>
+            <p>Statik javob qaytaradi. Odatda pipeline oxirida ishlatiladi.</p>
+            <pre><code class="language-yaml">- type: return_response
+  status: 200
+  headers:
+    Content-Type: "application/json"
+  body: '{"status": "ok", "user": "${auth.claims.sub}"}'</code></pre>
+            <ul>
+                <li><code>status</code>: HTTP status kodi.</li>
+                <li><code>headers</code>: (Ixtiyoriy) Javob sarlavhalari.</li>
+                <li><code>body</code>: Javob matni. O'zgaruvchilarni ishlatish mumkin.</li>
+            </ul>
+            <div class="callout note"><p><b>O'zgaruvchilar:</b> <code>${auth.claims.sub}</code> yoki <code>${counter.my_key.new_value}</code> kabi dinamik qiymatlar ishlatish mumkin.</p></div>
+            <h3>Boshqa amallar</h3>
+            <p>Shuningdek, <code>serve_static</code> (statik fayllar), <code>rewrite_headers</code> (headerlarni o'zgartirish), <code>increment_counter</code> (hisoblagich) mavjud.</p>
         </section>
         <section id="faq">
-            <h2>FAQ</h2>
-            <details><summary>Hot reload qanday ishlaydi?</summary>
-                <div><b>unicore.yaml</b> dagi har qanday o‘zgarish serverni qayta ishga tushirmasdan avtomatik qo‘llaniladi.</div>
+            <h2>Tez-tez so'raladigan savollar (FAQ)</h2>
+            <details>
+                <summary><code>cargo run</code> va <code>target/release/unicore</code> o'rtasidagi farq nima?</summary>
+                <div><code>cargo run</code> — tez, lekin optimallashtirilmagan versiyani ishga tushiradi. <code>target/release/unicore</code> esa maksimal optimallashtirilgan, production uchun mo'ljallangan binar fayl. Test va deploy uchun doim release build ishlating.</div>
             </details>
-            <details><summary>Qanday qilib o‘z action qo‘shsam bo‘ladi?</summary>
-                <div>Rust kodida Action enumiga yangi tur qo‘shing va pipeline_processor.rs da uni amalga oshiring.</div>
+            <details>
+                <summary>UniCore haqiqiy mijoz IP manzilini qanday aniqlaydi?</summary>
+                <div>Standart <code>Forwarded</code> va <code>X-Forwarded-For</code> headerlarini avtomatik tahlil qiladi. Bu <code>rate_limit</code> ni to'g'ri ishlashini ta'minlaydi, hatto UniCore boshqa balanslovchi ortida bo'lsa ham.</div>
             </details>
-            <details><summary>Maksimal RPS qancha?</summary>
-                <div>Temir va OS ga bog‘liq. Linuxda UniCore oddiy marshrutlarda o‘n minglab RPS bera oladi.</div>
+            <details>
+                <summary>Barcha backendlar ishlamay qolsa nima bo'ladi?</summary>
+                <div>Agar <code>health_check</code> yoqilgan va barcha targetlar UNHEALTHY bo'lsa, UniCore <code>503 Service Unavailable</code> qaytaradi va trafikni to'xtatadi.</div>
             </details>
-            <details><summary>Production uchun misollar qayerda?</summary>
-                <div><a href="#examples">Misollar bo‘limi</a> va repozitoriyadagi <b>README.md</b> ga qarang.</div>
-            </details>
-            <details><summary>Body/headersda o‘zgaruvchilar qanday ishlaydi?</summary>
-                <div><code>${counter.key.new_value}</code>, <code>${auth.claims.sub}</code>, <code>${header.X-My-Header}</code> kabi dinamik qiymatlar ishlatiladi.</div>
-            </details>
-            <details><summary>TLS ni qanday yoqaman?</summary>
-                <div><b>network</b> bo‘limida <b>tls</b> ni sertifikat va kalit yo‘llari bilan ko‘rsating.</div>
-            </details>
-            <details><summary>So‘rovlarni qanday log qilaman?</summary>
-                <div>Standart tracing orqali. Faylga chiqarishni main.rs da sozlash mumkin.</div>
-            </details>
-        </section>
-        <section id="run">
-            <h2>UniCore ni ishga tushirish</h2>
-            <ol>
-                <li>Rust ni o‘rnating: <a href="https://rustup.rs/">https://rustup.rs/</a></li>
-                <li>Loyihani build qiling: <code>cargo build --release</code></li>
-                <li>Ishga tushiring: <code>cargo run --release</code></li>
-                <li><b>unicore.yaml</b> dagi o‘zgarishlar hot reload orqali darhol qo‘llaniladi.</li>
-            </ol>
         </section>
     </main>
+
     <footer>
-        <p>UniCore &copy; 2025. Muallif: <a href="https://github.com/eukalpia" target="_blank">Umiraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a>. GitHub Pages uchun hujjatlar.</p>
+        <p>UniCore © 2025. <b>UniOS</b> da ishlab chiqilgan. <br>Muallif: <a href="https://github.com/eukalpia" target="_blank">Umaraliyev Ravshan Rustamjon o‘g‘li (eukalpia)</a>.</p>
     </footer>
+
+    <script>
+        document.querySelectorAll('pre').forEach(pre => {
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.innerText = 'Copy';
+            button.addEventListener('click', () => {
+                const code = pre.querySelector('code').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
+            });
+            pre.appendChild(button);
+        });
+    </script>
 </body>
 </html>
